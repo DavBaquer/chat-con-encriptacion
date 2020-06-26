@@ -1,0 +1,156 @@
+﻿@model IEnumerable<ChatEmcriptacion.mensajeria>
+
+
+@{
+    ViewBag.Title = "Index";
+}
+<div class="row">
+    <input type="hidden" id="correo" value=@ViewBag.correo />
+    <input type="button" id="actualizar" value="INCIAR CHAT" class="btn btn-success" />
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a href="/Home/Logout"><input type="button" value="CERRAR SESION" class="btn btn-warning" style="float:right" /></a>
+    }
+
+    <input type="hidden" value="" />
+</div>
+
+
+
+<div id="contenedor" style="display:none">
+    
+        <!-- /.panel-heading -->
+        <div class="card-header msg_head" style="width:700px; background-color:darkorange"><div class="d-flex bd-highlight"><h3>CHAT SEGURIDADES I.</h3></div></div>
+
+        <div id="discussion" class="card" style="width:700px">
+
+
+
+
+
+        </div>
+
+        <!-- /.panel-body -->
+        <div class="card-footer" style="width:700px;">
+            <div class="input-group" style="width:700px;">
+                <div class="input-group-append" style="width:700px;">
+                    <input id="message" type="text" class="textarea-chat" name="message" placeholder="Escribe tu mensaje aqui..." />
+
+
+                    <input type="button" class="btn btn-warning btn-sm" id="sendmessage" value="Enviar">
+
+
+
+                </div>
+            </div>
+        </div>
+    
+</div>
+
+
+@section scripts{
+    <script src="~/Scripts/jquery.signalR-2.4.1.js"></script>
+    <script src="/signalr/hubs"></script>
+    <script type="text/javascript">
+        $(function () {
+            var chat = $.connection.chatHub;
+            chat.client.sendChat = function (lista, usuarios) {
+
+                $('#discussion').html("");
+                $.each(lista, function (index, item) {
+                    $.each(usuarios, function (index, usu) {
+
+
+
+
+                        if (usu.idusuario == item.idemisor) {
+                            if ($('#correo').val() == usu.correo) {
+
+                                $('#discussion').append('<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send" style="color:white; text-align:right;" >TÚ:<img src="https://img.icons8.com/fluent/48/000000/user-male-circle.png" class="rounded-circle user_img_msg"><pre>' + item.mensaje + ' </pre><span class="msg_time_send"> ' + item.fecha + '</span></div><br/></div>');
+                            } else {
+                                $('#discussion').append('<div class="d-flex justify-content-end mb-4" ><div class="msg_cotainer_send" style="color:blue;  background-color:#F2F3F4;" ><img src="https://img.icons8.com/fluent/48/000000/user-male-circle.png" class="rounded-circle user_img_msg">' + usu.apellidos + ' ' + usu.nombres + ':<pre>' + item.mensaje + ' </pre><span class="msg_time_send"> ' + item.fecha + '</span></div><br/></div>');
+
+                            }
+
+                        }
+
+
+
+                    });
+
+                });
+            };
+
+
+
+            $.connection.hub.start().done(function () {
+
+                $("#sendmessage").click(function () {
+
+
+                    var mensaje = $("#message").val()
+
+                    $("#message").val("").focus();
+
+                    $.ajax(
+                        {
+                            async: true,
+                            url: "/mensajerias/GuardarMensaje?textmessage=" + mensaje,
+                            cache: false,
+                            dataType: "json",
+
+
+                            success: function (mensaje) {
+                                if (mensaje != "") {
+                                    chat.server.send(mensaje);
+                                }
+
+                            }
+
+
+                        })
+
+
+
+
+                });
+            });
+
+            $.connection.hub.start().done(function () {
+
+                $("#actualizar").click(function () {
+
+                    if ($("#actualizar").val() == "INCIAR CHAT") {
+                        var mensaje = $("#message").val()
+                        var valor_sesion = $('#variable_sesion').val();
+                        $("#message").val("").focus();
+                        $("#actualizar").val("CERRAR CHAT");
+                        $("#actualizar").removeClass("btn-success");
+                        $("#actualizar").addClass("btn-danger");
+                        $("#contenedor").show("slow");
+
+                        chat.server.send("actualizacion");
+
+
+                    } else {
+
+                        $("#actualizar").val("INCIAR CHAT");
+                        $("#actualizar").removeClass("btn-danger");
+                        $("#actualizar").addClass("btn-success");
+
+                        $("#contenedor").hide("slow");
+
+                    }
+                });
+            });
+
+        });
+
+    </script>
+}
+
+
+
+
+

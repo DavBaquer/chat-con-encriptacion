@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<h2 style="padding-left:100px">Ingrese a su cuenta</h2>
+
+<div class="container form-horizontal">
+    @{
+
+        if (!string.IsNullOrEmpty(ViewBag.Message))
+        {
+            <div class="alert alert-warning">@ViewBag.Message</div>
+
+        }
+    }
+
+
+    <form action="/Home/Login" method="post">
+        <div class="form-group" style="padding-left:100px">
+            <label class="control-label col-md-2">Correo:</label>
+            <input class="form-control" type="text" name="email" value="" />
+
+        </div>
+        <div class="form-group" style="padding-left:100px">
+            <label class="control-label col-md-2">Contraseña:</label>
+            <input class="form-control" type="password" name="password" value="" />
+        </div>
+        <div class="form-group" style="padding-left:100px">
+            <div class="col-md-offset-2 col-md-10">
+                <button class="btn btn-success">Acceder</button>
+                <a href="~/usuarios/Create"> <input type="button" value="Registrarse" class="btn btn-info"></a>
+
+            </div>
+            </div>
+</form>
+</div>
